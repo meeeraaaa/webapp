@@ -31,7 +31,7 @@ export const authenticateToken = async (req, res, next) => {
 
 // Role-based authorization middleware for admin
 export const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
+  if (req.user.role !== "") {
     return res.status(403).json({ error: "Access denied. Admins only." });
   }
   next();

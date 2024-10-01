@@ -1,19 +1,38 @@
-// src/components/Auth/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Perform login action (API call)
+    
     console.log("Email:", email, "Password:", password);
-    // Navigate to the dashboard upon success
-    // navigate("/dashboard");
+
+    try {
+      const response = await axios.post("http://localhost:1200/auth/login", {
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+      localStorage.setItem("token", token); 
+      if (user.role === "admin") {
+        navigate("/admin-dashboard");
+      } 
+       else {
+        //navigate("/user-dashboard");
+        alert("Access denied. You do not have admin privileges.");
+       }
+    } catch (error) {
+      console.log("Login failed. Please check your credentials.");
+      console.error(error);
+    }
   };
+
 
   return (
     <div className="login-container d-flex align-items-center justify-content-center">
@@ -22,7 +41,9 @@ const Login = () => {
           <img
             src={require("../assets/login-illustration.png")}
             alt="Login Illustration"
+            className="login-image"
           />
+          <div className="login-text"> Evolve. </div> 
         </div>
         <div className="login-form">
           <h2 className="text-center mb-4">Welcome Back!</h2>
@@ -51,30 +72,12 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="rememberMe"
-                />
-                <label className="form-check-label" htmlFor="rememberMe">
-                  Remember me
-                </label>
-              </div>
-              <a href="/forgot-password" className="forgot-link">
-                Forgot password?
-              </a>
-            </div>
+            
             <button type="submit" className="btn btn-primary w-100">
               Login
             </button>
           </form>
-          <div className="text-center mt-3">
-            <p>
-              Don’t have an account? <a href="/register">Sign up</a>
-            </p>
-          </div>
+          
         </div>
       </div>
     </div>
