@@ -45,7 +45,7 @@ const EmployeesList = () => {
           </tr>
         </thead>
         <tbody>
-          {employees.length > 0 ? (  // Check if there are employees to display
+          {employees.length > 0 ? (  
             employees.map((user, index) => (  // Map through each employee
               <tr key={user.userId}>
                 <td>{index + 1}</td>  {/* Display the row index */}
