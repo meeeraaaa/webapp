@@ -171,28 +171,25 @@ export const getUserProfile = async (req, res) => {
 
     try {
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { id: parseInt(userId) },
             select: {
                 id: true,
                 name: true,
                 mail: true,
                 skills: { select: { skill: { select: { name: true } } } },
                 progress: {
+                    where: {
+                        percentage_completed: 100, // Fetch only completed courses
+                    },
+                    orderBy: {
+                        updatedAt: 'desc',
+                    },
+                    distinct: ['courseId'], // Get only one entry per course
                     include: {
                         course: {
                             select: {
                                 id: true,
                                 title: true,
-                                progress: {
-                                    where: {
-                                        userId: userId,
-                                        percentage_completed: 100 
-                                    },
-                                    select: {
-                                        percentage_completed: true,
-                                        certificate: true,
-                                    }
-                                }
                             }
                         }
                     }
@@ -204,7 +201,12 @@ export const getUserProfile = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        const completedCourses = user.progress.filter(item => item.course.progress.length > 0);
+        const completedCourses = user.progress.map(item => ({
+            id: item.course.id,
+            title: item.course.title,
+            percentage_completed: item.percentage_completed,
+            certificate: item.certificate,
+        }));
 
         return res.status(200).json({
             user: {
@@ -212,12 +214,7 @@ export const getUserProfile = async (req, res) => {
                 name: user.name,
                 mail: user.mail,
                 skills: user.skills.map(skill => skill.skill.name),
-                completedCourses: completedCourses.map(course => ({
-                    id: course.course.id,
-                    title: course.course.title,
-                    percentage_completed: course.course.progress[0]?.percentage_completed,
-                    certificate: course.course.progress[0]?.certificate
-                }))
+                completedCourses
             }
         });
     } catch (error) {
@@ -225,15 +222,28 @@ export const getUserProfile = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 export const getUserCourses = async (req, res) => {
-    const userId = req.user.userId;
+    const userId = req.user?.id;
 
     try {
+        // Fetch latest progress for courses that are not fully completed (percentage < 100%)
         const progress = await prisma.progress.findMany({
-            where: { userId: userId },
+            where: {
+                userId: parseInt(userId),
+                percentage_completed: { lt: 100 } // Fetch courses with less than 100% completion
+            },
+            orderBy: {
+                updatedAt: 'desc', // Ensure we get the latest progress
+            },
+            distinct: ['courseId'], // Get the latest entry per course
             include: {
                 course: {
-                    select: { id: true, title: true, no_of_chapters: true }
+                    select: {
+                        id: true,
+                        title: true,
+                        no_of_chapters: true
+                    }
                 }
             }
         });

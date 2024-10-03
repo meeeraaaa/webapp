@@ -23,8 +23,8 @@ router.put('/update-progress', updateCourseProgress);
 router.post('/complete-course', completeCourse);
 
 // Route to get user courses
-router.get('/courses', authenticate, getUserCourses);
-router.get('/course/:id', authenticate, getCourseDetails);
+router.get('/courses', authenticateToken, getUserCourses);
+//router.get('/course/:id', authenticateToken, getCourseDetails);
 // Route to get user profile
 router.get('/profile', getUserProfile,authenticateToken);
 
