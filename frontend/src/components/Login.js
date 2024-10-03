@@ -1,3 +1,4 @@
+//C:\Users\AnanyaSarkar\Documents\project\webapp\frontend\src\components\Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -24,8 +25,7 @@ const Login = () => {
         navigate("/admin-dashboard");
       } 
        else {
-        //navigate("/user-dashboard");
-        alert("Access denied. You do not have admin privileges.");
+        navigate("/user-dashboard");
        }
     } catch (error) {
       console.log("Login failed. Please check your credentials.");

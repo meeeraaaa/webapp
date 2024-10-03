@@ -30,7 +30,7 @@ model User {
 
 model Course {
   id               Int           @id @default(autoincrement())
-  title            String
+  title            String        @unique
   difficulty_level Difficulty
   no_of_chapters   Int
   duration         Float
@@ -41,14 +41,14 @@ model Course {
 
 model Designation {
   id     Int                @id @default(autoincrement())
-  title  String
+  title  String             @unique
   users  User[]
   skills DesignationSkill[]
 }
 
 model Skill {
   id                Int                @id @default(autoincrement())
-  name              String
+  name              String             @unique
   userSkills        UserSkill[]
   courseSkills      CourseSkill[]
   designationSkills DesignationSkill[]

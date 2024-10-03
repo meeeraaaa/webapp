@@ -1,13 +1,13 @@
 //C:\Users\AnanyaSarkar\Documents\project\webapp\backend\controllers\adminController.js
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
-import pool from '../db.js';
-
-const prisma = new PrismaClient()
+//import pool from '../db.js';
+import prisma from'../db.js';
+//const prisma = new PrismaClient()
 
 export const addEmployee = async (req, res) => {
   try {
-    console.log(req);
+    //console.log(req);
 
     const { name, email, password, designationId, sex, experience } = req.body;
 
@@ -162,52 +162,23 @@ export const updateCourse = async (req, res) => {
   }
 };
 
-// // Assign a course to an employee
-// export const assignCourseToEmployee = async (req, res) => {
-//   try {
-//     const { userId, courseId } = req.body;
-
-//     // Validate required fields
-//     if (!userId || !courseId) {
-//       return res.status(400).json({ error: "User ID and Course ID are required" });
-//     }
-
-//     // Create a new progress entry for the employee
-//     const progressEntry = await prisma.progress.create({
-//       data: {
-//         userId: parseInt(userId),
-//         courseId: parseInt(courseId),
-//         chapters_completed: 0,
-//         percentage_completed: 0,
-//       },
-//     });
-
-//     return res.status(201).json({ message: "Course assigned successfully", progress: progressEntry });
-//   } catch (error) {
-//     console.error(error.message);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
-
-
 // Assign course to employee
-// export const assignCourseToEmployee = async (req, res) => {
-//   const { courseId, userId } = req.body;
+export const assignCourseToEmployee = async (req, res) => {
+  const { courseId, userId } = req.body;
 
-//   try {
-//     const progress = await prisma.progress.create({
-//       data: {
-//         course: { connect: { id: courseId } },
-//         user: { connect: { id: userId } },
-//         chapters_completed: 0,
-//         percentage_completed: 0
-//       }
-//     });
+  try {
+    const progress = await prisma.progress.create({
+      data: {
+        course: { connect: { id: courseId } },
+        user: { connect: { id: userId } },
+        chapters_completed: 0,
+        percentage_completed: 0
+      }
+    });
 
-//     return res.status(201).json({ message: "Course assigned successfully", progress });
-//   } catch (error) {
-//     console.error(error.message);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
+    return res.status(201).json({ message: "Course assigned successfully", progress });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};

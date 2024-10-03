@@ -21,8 +21,11 @@ export const authenticateToken = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
-
+    
     req.user = user; // Attach the user to the request
+    // console.log(req.user);
+    
+
     next(); // Proceed to the next middleware/route handler
   } catch (error) {
     return res.status(403).json({ error: "Invalid token." });

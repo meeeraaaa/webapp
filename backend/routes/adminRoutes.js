@@ -5,7 +5,7 @@ import {
     getEmployees,
     addCourse,
     updateCourse,
-    //assignCourseToEmployee
+    assignCourseToEmployee,
     getCourses
   } from '../controllers/adminController.js';
   //import { authenticateToken, authorizeAdmin } from "./authMiddleware.js";
@@ -20,5 +20,5 @@ router.get("/employees", getEmployees);
 router.post("/add-course", addCourse);
 router.put("/update-course/:id", updateCourse);
 router.get("/courses",  getCourses);
-// router.post("/assign-course", assignCourseToEmployee);
+router.post("/assign-course", assignCourseToEmployee);
 export default router;

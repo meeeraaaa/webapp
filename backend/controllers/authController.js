@@ -5,9 +5,9 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 
 export const login = async (req, res) => {
-  try {
+  try {    
     const { email, password } = req.body;
-    console.log("front end able to send Email:", email, " and Password:", password);
+    //console.log("front end able to send Email:", email, " and Password:", password);
 
     // Find the user by email
     const user = await prisma.user.findUnique({
@@ -40,7 +40,8 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Login error:", error.message);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

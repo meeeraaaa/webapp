@@ -2,7 +2,7 @@
 import React from "react";
 import "./../../styles/App.css";
 import Navbar from "./../Layout/NavBar";
-const Dashboard = () => {
+const AdminDashboard = () => {
   return (
     <div className="container mt-5">
         <Navbar /> 
@@ -34,4 +34,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

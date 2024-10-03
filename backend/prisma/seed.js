@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Clear the database
+  // Clear the database
   await prisma.userSkill.deleteMany({});
   await prisma.courseSkill.deleteMany({});
   await prisma.designationSkill.deleteMany({});
@@ -16,10 +16,7 @@ async function main() {
 
   console.log('Database cleared');
 
-  // 2. Seed data
-  const hashedPassword = await bcrypt.hash('root', 10);
-
-  // Seed skills using upsert
+  // Seed skills
   const skills = [
     { name: 'JavaScript' },
     { name: 'Python' },
@@ -30,86 +27,91 @@ async function main() {
     { name: 'CSS' },
     { name: 'React' },
     { name: 'Node.js' },
-    { name: 'Django' }
+    { name: 'Django' },
   ];
 
-  const createdSkills = [];
   for (const skill of skills) {
-    const createdSkill = await prisma.skill.upsert({
+    await prisma.skill.upsert({
       where: { name: skill.name },
-      update: {}, // No update needed if it already exists
+      update: {},
       create: skill,
     });
-    createdSkills.push(createdSkill);
   }
 
-  // Seed designations using upsert
+  // Seed designations
   const designations = [
     { title: 'SDE' },
     { title: 'SDE2' },
     { title: 'Enabler' },
     { title: 'Consultant' },
-    { title: 'Architect' }
+    { title: 'Architect' },
   ];
 
   for (const designation of designations) {
     await prisma.designation.upsert({
       where: { title: designation.title },
-      update: {}, // No update needed if it already exists
+      update: {},
       create: designation,
     });
   }
 
-  // Seed courses using upsert
+  // Retrieve designation IDs to use for user creation
+  const allDesignations = await prisma.designation.findMany();
+  const designationMap = Object.fromEntries(allDesignations.map(d => [d.title, d.id]));
+
+  // Seed courses
   const courses = [
     { title: 'Full Stack Development', difficulty_level: 'Medium', no_of_chapters: 10, duration: 30 },
     { title: 'Data Science with Python', difficulty_level: 'Hard', no_of_chapters: 8, duration: 25 },
     { title: 'Web Development Basics', difficulty_level: 'Easy', no_of_chapters: 5, duration: 15 },
     { title: 'Advanced Java Programming', difficulty_level: 'Hard', no_of_chapters: 6, duration: 20 },
-    { title: 'Introduction to SQL', difficulty_level: 'Easy', no_of_chapters: 4, duration: 10 }
+    { title: 'Introduction to SQL', difficulty_level: 'Easy', no_of_chapters: 4, duration: 10 },
   ];
 
-  const createdCourses = [];
   for (const course of courses) {
-    const createdCourse = await prisma.course.upsert({
+    await prisma.course.upsert({
       where: { title: course.title },
-      update: {}, // No update needed if it already exists
+      update: {},
       create: course,
     });
-    createdCourses.push(createdCourse);
   }
 
-  // Create course-skill associations
-  const courseSkillAssociations = [
-    { courseId: createdCourses[0].id, skillId: createdSkills[0].id }, // Full Stack Development - JavaScript
-    { courseId: createdCourses[0].id, skillId: createdSkills[5].id }, // Full Stack Development - HTML
-    { courseId: createdCourses[0].id, skillId: createdSkills[6].id }, // Full Stack Development - CSS
-    { courseId: createdCourses[1].id, skillId: createdSkills[1].id }, // Data Science with Python - Python
-    { courseId: createdCourses[2].id, skillId: createdSkills[2].id }, // Web Development Basics - Java
-    { courseId: createdCourses[3].id, skillId: createdSkills[0].id }, // Advanced Java Programming - JavaScript
-    { courseId: createdCourses[4].id, skillId: createdSkills[4].id }, // Introduction to SQL - SQL
-  ];
+  const allSkills = await prisma.skill.findMany();
+  const allCourses = await prisma.course.findMany();
 
-  for (const association of courseSkillAssociations) {
-    await prisma.courseSkill.create({
-      data: {
-        courseId: association.courseId,
-        skillId: association.skillId,
-      },
-    });  console.log(`Created courseSkill record: ${createdCourseSkill.id}`);
-
+  // Create CourseSkill relationships
+  for (const course of allCourses) {
+    for (const skill of allSkills) {
+      await prisma.courseSkill.create({
+        data: {
+          courseId: course.id,
+          skillId: skill.id,
+        },
+      });
+    }
   }
 
-  const architectDesignation = await prisma.designation.findFirst({
-    where: { title: 'Architect' }
-  });
+  // Create DesignationSkill relationships
+  for (const designation of allDesignations) {
+    for (const skill of allSkills) {
+      await prisma.designationSkill.create({
+        data: {
+          designationId: designation.id,
+          skillId: skill.id,
+        },
+      });
+    }
+  }
+
+  // Create admin user
+  const hashedPassword = await bcrypt.hash('root', 10);
 
   await prisma.user.create({
     data: {
       name: 'admin',
       mail: 'adminnnn@jmangroup.com',
       role: 'admin',
-      designationId: architectDesignation.id,
+      designationId: designationMap['Architect'], // Use the mapped ID
       sex: 'f',
       experience: 14,
       joindate: new Date('2010-01-01T00:00:00Z'),
@@ -117,11 +119,58 @@ async function main() {
     }
   });
 
+  // Seed additional employees with correct designation IDs
+  const employees = [
+    {
+      name: "purnima",
+      mail: "purnima@jmangroup.com",
+      designationId: designationMap['Enabler'], // Use the mapped ID
+      sex: "f",
+      experience: 4
+    },
+    {
+      name: "harsh",
+      mail: "harsh@jmangroup.com",
+      designationId: designationMap['SDE2'], // Use the mapped ID
+      sex: "m",
+      experience: 4
+    },
+    {
+      name: "aishwarya",
+      mail: "aishwarya@jmangroup.com",
+      designationId: designationMap['Architect'], // Use the mapped ID
+      sex: "f",
+      experience: 12
+    },
+    {
+      name: "ashwin",
+      mail: "ashwin@jmangroup.com",
+      designationId: designationMap['SDE'], // Use the mapped ID
+      sex: "m",
+      experience: 3
+    }
+  ];
+
+  for (const employee of employees) {
+    await prisma.user.create({
+      data: {
+        name: employee.name,
+        mail: employee.mail,
+        role: 'employee',
+        designationId: employee.designationId, // Use the mapped ID
+        sex: employee.sex,
+        experience: employee.experience,
+        joindate: new Date(),
+        Hashedpassword: hashedPassword,
+      }
+    });
+  }
+
   console.log('Seeding completed');
 }
 
 main()
-  .catch(e => console.error(e))
+  .catch(e => console.error('Error seeding data:', e))
   .finally(async () => {
     await prisma.$disconnect();
   });
