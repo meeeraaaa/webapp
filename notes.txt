@@ -1,0 +1,61 @@
+      <form onSubmit={handleCourseSubmit}>
+        <div className="form-group">
+          <label>Course Title</label>
+          <input
+            type="text"
+            className="form-control"
+            value={newCourse.title}
+            onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Difficulty Level</label>
+          <select
+            className="form-control"
+            value={newCourse.difficulty_level}
+            onChange={(e) => setNewCourse({ ...newCourse, difficulty_level: e.target.value })}
+          >
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Number of Chapters</label>
+          <input
+            type="number"
+            className="form-control"
+            value={newCourse.no_of_chapters}
+            onChange={(e) => setNewCourse({ ...newCourse, no_of_chapters: e.target.value })}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Duration (hours)</label>
+          <input
+            type="number"
+            className="form-control"
+            value={newCourse.duration}
+            onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Skills</label>
+          <select
+            multiple
+            className="form-control"
+            value={newCourse.skills}
+            onChange={(e) => setNewCourse({ ...newCourse, skills: [...e.target.selectedOptions].map(option => option.value) })}
+          >
+            {skills.map(skill => (
+              <option key={skill.id} value={skill.id}>{skill.name}</option>
+            ))}
+          </select>
+        </div>
+        <button type="submit" className="btn btn-primary">
+          {editCourseId ? "Update Course" : "Add Course"}
+        </button>
+        {editCourseId && <button onClick={resetCourseForm} className="btn btn-secondary ml-2">Cancel</button>}
+      </form>

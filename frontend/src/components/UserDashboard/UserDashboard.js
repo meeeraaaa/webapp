@@ -44,7 +44,7 @@ const UserDashboard = () => {
             <h1 className="dashboard-title">Welcome, {userInfo.name}</h1>
             <nav className="user-nav">
                 <button onClick={() => navigate('/profile')}>Profile</button>
-                <button onClick={() => navigate('/user/courses')}>Courses</button>
+                {/* <button onClick={() => navigate('/user/courses')}>Courses</button> */}
                 <button onClick={() => localStorage.removeItem('token') && navigate('/login')}>Logout</button>
             </nav>
             <div className="course-list">

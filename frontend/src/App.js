@@ -20,7 +20,7 @@ function App() {
           {/* user routes */}
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/profile" element={<UserProfile />} /> 
-          <Route path="/user/course/:id" element={<UserCourses />} /> {/* Assuming you have a CourseDetails component */}
+          <Route path="/user/course/:id" element={<UserCourses />} /> 
 
           {/* admin routes */}
           <Route path="/admin-dashboard" element={<AdminDashboard />} />

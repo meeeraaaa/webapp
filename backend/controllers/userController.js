@@ -28,11 +28,11 @@ export const startCourse = async (req, res) => {
     }
   };
 
-export const updateCourseProgress = async (req, res) => {
-    const { userId, courseId, chaptersCompleted } = req.body;
-
+  export const updateCourseProgress = async (req, res) => {
+    const { courseId, chaptersCompleted } = req.body;
+    const userId = req.user.id;
     try {
-        // Fetch total chapters in the course
+        //  chapters in the course
         const course = await prisma.course.findUnique({
             where: { id: parseInt(courseId) },
             select: { no_of_chapters: true }
@@ -44,8 +44,8 @@ export const updateCourseProgress = async (req, res) => {
 
         const totalChapters = course.no_of_chapters;
 
-        // Fetch current progress for the user and course
-        const currentProgress = await prisma.progress.findMany({
+        // current progress for the user and course
+        const currentProgress = await prisma.progress.findFirst({
             where: {
                 userId: parseInt(userId),
                 courseId: parseInt(courseId),
@@ -58,12 +58,10 @@ export const updateCourseProgress = async (req, res) => {
             },
         });
 
-        // Calculate new chapters completed
-        const previousChaptersCompleted = currentProgress.length > 0 
-            ? currentProgress.reduce((acc, progress) => acc + progress.chapters_completed, 0)
-            : 0;
+        const previousChaptersCompleted = currentProgress ? currentProgress.chapters_completed : 0;
 
-        const newChaptersCompleted = previousChaptersCompleted + chaptersCompleted;
+        // Calculate new chapters completed, ensuring not to exceed total chapters
+        const newChaptersCompleted = Math.min(totalChapters, previousChaptersCompleted + chaptersCompleted);
 
         // Create a new progress entry
         const progress = await prisma.progress.create({
@@ -71,7 +69,7 @@ export const updateCourseProgress = async (req, res) => {
                 userId: parseInt(userId),
                 courseId: parseInt(courseId),
                 chapters_completed: newChaptersCompleted,
-                percentage_completed: Math.min(100, (newChaptersCompleted / totalChapters) * 100),
+                percentage_completed: (newChaptersCompleted / totalChapters) * 100,
             },
         });
 
@@ -81,7 +79,6 @@ export const updateCourseProgress = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
-
 
 // Complete a course and add the skill
 // Complete a course and add the skill
@@ -94,10 +91,13 @@ export const completeCourse = async (req, res) => {
             return res.status(400).json({ error: "User ID and Course ID are required" });
         }
 
-        // Get the number of chapters of the course and its skills
+        const userIdInt = parseInt(userId);
+        const courseIdInt = parseInt(courseId);
+
+        // Fetch the course and its associated skills
         const courseWithChapters = await prisma.course.findUnique({
-            where: { id: parseInt(courseId) },
-            select: { no_of_chapters: true, skills: true } // Number of chapters and skills
+            where: { id: courseIdInt },
+            select: { no_of_chapters: true, skills: true } // Course's number of chapters and associated skills
         });
 
         if (!courseWithChapters) {
@@ -106,64 +106,55 @@ export const completeCourse = async (req, res) => {
 
         const { no_of_chapters, skills } = courseWithChapters;
 
-        // Create a new progress entry for course completion
+        // Record the course progress
         const progress = await prisma.progress.create({
             data: {
-                userId: parseInt(userId),
-                courseId: parseInt(courseId),
+                userId: userIdInt,
+                courseId: courseIdInt,
                 chapters_completed: no_of_chapters,
                 percentage_completed: 100,
-                certificate: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9RL32F8U1YP9Sm9zeAUSpEWYsMJVItkdidA&s",
+                certificate: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9RL32F8U1YP9Sm9zeAUSpEWYsMJVItkdidA&s", // Example certificate URL
             }
         });
 
-        // Get current skills of the user
-        const currentUserSkills = await prisma.user.findUnique({
-            where: { id: parseInt(userId) },
+        // Get the user's current skills (from UserSkill table)
+        const currentUserSkills = await prisma.userSkill.findMany({
+            where: { userId: userIdInt },
             select: {
-                skills: {
-                    select: {
-                        id: true
-                    }
-                }
+                skillId: true // Only need the skill IDs
             }
         });
 
-        // Extract the IDs of current skills
-        const currentSkillIds = currentUserSkills.skills.map(skill => skill.id);
+        // Extract the IDs of the user's current skills
+        const currentSkillIds = currentUserSkills.map(userSkill => userSkill.skillId);
 
-        // Identify new skills that need to be added
-        const newSkills = skills.filter(skill => !currentSkillIds.includes(skill.id));
+        // Identify the new skills that the user doesn't already have
+        const newSkills = skills.filter(courseSkill => !currentSkillIds.includes(courseSkill.skillId));
 
-        // Check if new skills exist in the database
-        const existingSkills = await prisma.skill.findMany({
-            where: {
-                id: { in: newSkills.map(skill => skill.id) }
-            }
-        });
-
-        // Only connect new skills if there are valid ones to add
-        if (existingSkills.length > 0) {
-            await prisma.user.update({
-                where: { id: parseInt(userId) },
-                data: {
-                    skills: {
-                        connect: existingSkills.map(skill => ({ id: skill.id }))
-                    }
-                }
+        // Only insert new skills if there are any
+        if (newSkills.length > 0) {
+            await prisma.userSkill.createMany({
+                data: newSkills.map(skill => ({
+                    userId: userIdInt,
+                    skillId: skill.skillId
+                }))
             });
-        } else {
-            console.warn("No valid new skills found to connect.");
+
+            return res.status(201).json({ message: "Course completed, new skills added, and progress recorded successfully", progress });
         }
 
-        return res.status(201).json({ message: "Course completed and progress recorded successfully", progress });
+        // If no new skills, just return success for progress completion
+        return res.status(201).json({ message: "Course completed, no new skills to update, progress recorded successfully", progress });
+
     } catch (error) {
         console.error("Error updating course completion:", error.message);
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 export const getUserProfile = async (req, res) => {
-    const userId = req.user?.id;
+    //const userId = req.user?.id;
+    const userId = req.user.id; // Assume req.user is always set by middleware
 
     if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
@@ -176,6 +167,7 @@ export const getUserProfile = async (req, res) => {
                 id: true,
                 name: true,
                 mail: true,
+                designation: { select: { title: true } },
                 skills: { select: { skill: { select: { name: true } } } },
                 progress: {
                     where: {
@@ -213,6 +205,7 @@ export const getUserProfile = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 mail: user.mail,
+                designation: user.designation.title ,
                 skills: user.skills.map(skill => skill.skill.name),
                 completedCourses
             }
@@ -224,17 +217,17 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const getUserCourses = async (req, res) => {
-    const userId = req.user?.id;
+    //const userId = req.user?.id;
+    const userId = req.user.id; // Assume req.user is always set by middleware
 
     try {
-        // Fetch latest progress for courses that are not fully completed (percentage < 100%)
+        // Fetch latest progress for all courses for the user
         const progress = await prisma.progress.findMany({
             where: {
                 userId: parseInt(userId),
-                percentage_completed: { lt: 100 } // Fetch courses with less than 100% completion
             },
             orderBy: {
-                updatedAt: 'desc', // Ensure we get the latest progress
+                updatedAt: 'desc', // Ensure we get the latest progress entries
             },
             distinct: ['courseId'], // Get the latest entry per course
             include: {
@@ -248,11 +241,14 @@ export const getUserCourses = async (req, res) => {
             }
         });
 
-        const courses = progress.map(item => ({
-            id: item.course.id,
-            title: item.course.title,
-            percentage_completed: item.percentage_completed,
-        }));
+        // Filter out courses where the latest progress is 100%
+        const courses = progress
+            .filter(item => item.percentage_completed < 100) // Only include courses that are not fully completed
+            .map(item => ({
+                id: item.course.id,
+                title: item.course.title,
+                percentage_completed: item.percentage_completed,
+            }));
 
         return res.status(200).json({ courses });
     } catch (error) {
@@ -261,3 +257,65 @@ export const getUserCourses = async (req, res) => {
     }
 };
 
+export const getCourseDetails = async(req,res) => { //opens up the course page for the user to update the progress 
+    const userId = req.user.id;
+    const courseId = parseInt(req.params.id);
+
+    try {
+        // Fetch the course details (like number of chapters)
+        const course = await prisma.course.findUnique({
+            where: {
+                id: courseId
+            },
+            select: {
+                id: true,
+                title: true,
+                no_of_chapters: true,
+                difficulty_level: true,
+                skills: { // Add this to fetch skills associated with the course
+                    select: {
+                        skill: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!course) {
+            return res.status(404).json({ error: "Course not found" });
+        }
+
+        // Fetch the user's last progress for this course
+        const progress = await prisma.progress.findFirst({
+            where: {
+                userId: parseInt(userId),
+                courseId: courseId
+            },
+            orderBy: {
+                updatedAt: 'desc' // Get the latest progress
+            }
+        });
+
+        // Determine how many chapters have been completed
+        const completedChapters = progress ? progress.completed_chapters : 0;
+
+        // Return course details along with the user's progress
+        return res.status(200).json({
+            course: {
+                id: course.id,
+                title: course.title,
+                no_of_chapters: course.no_of_chapters,
+                skills: course.skills
+            },
+            progress: {
+                completed_chapters: completedChapters
+            }
+        });
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}

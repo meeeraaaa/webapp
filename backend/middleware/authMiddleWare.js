@@ -22,7 +22,7 @@ export const authenticateToken = async (req, res, next) => {
       return res.status(404).json({ error: "User not found." });
     }
     
-    req.user = user; // Attach the user to the request
+    req.user = user; // attaching the user to the request
     // console.log(req.user);
     
 
@@ -34,7 +34,7 @@ export const authenticateToken = async (req, res, next) => {
 
 // Role-based authorization middleware for admin
 export const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== "") {
+  if (req.user.role !== "admin") {
     return res.status(403).json({ error: "Access denied. Admins only." });
   }
   next();

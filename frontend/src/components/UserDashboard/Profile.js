@@ -21,6 +21,7 @@ const Profile = () => {
 
                 const data = await response.json();
                 setUser(data.user);
+                //console.log('this is the user data ' , data.user);
             } catch (error) {
                 console.error('Error fetching user profile:', error);
             } finally {
@@ -41,6 +42,7 @@ const Profile = () => {
         <div className="profile">
             <h1>{user.name}'s Profile</h1>
             <h2>Email: {user.mail}</h2>
+            <h3> {user.designation }</h3>
             <h3>Skills:</h3>
             <ul>
                 {user.skills.map(skill => (

@@ -4,7 +4,8 @@ import {
     updateCourseProgress, 
     completeCourse,
     getUserCourses,
-    getUserProfile
+    getUserProfile,
+    getCourseDetails
 } from '../controllers/userController.js';
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
 
@@ -24,7 +25,7 @@ router.post('/complete-course', completeCourse);
 
 // Route to get user courses
 router.get('/courses', authenticateToken, getUserCourses);
-//router.get('/course/:id', authenticateToken, getCourseDetails);
+router.get('/course/:id', authenticateToken, getCourseDetails);
 // Route to get user profile
 router.get('/profile', getUserProfile,authenticateToken);
 
