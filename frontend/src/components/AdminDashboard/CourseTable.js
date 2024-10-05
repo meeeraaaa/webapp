@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { FaEdit, FaUserPlus } from 'react-icons/fa';
 import axios from 'axios';
 import { Table, Button, Container } from 'react-bootstrap';
+import AssignCourseModal from './AssignCourseModal'; 
+import EditCourseModal from './EditCourseModal';
 
 const CourseTable = () => {
   const [courses, setCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  // Fetch courses data from the API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -26,6 +30,26 @@ const CourseTable = () => {
 
     fetchCourses();
   }, []);
+  const handleShowAssignModal = (courseId) => {
+    setSelectedCourseId(courseId);
+    setShowAssignModal(true);
+  };
+
+  const handleShowEditModal = (courseId) => {
+    setSelectedCourseId(courseId);
+    setShowEditModal(true);
+  };
+
+  // Hide the modals
+  const handleCloseAssignModal = () => {
+    setShowAssignModal(false);
+    setSelectedCourseId(null);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedCourseId(null);
+  };
 
   return (
     <Container>
@@ -54,10 +78,15 @@ const CourseTable = () => {
               <td>{course.skills.join(', ')}</td>
               <td>{course.numberOfEmployeesAssigned}</td>
               <td>
-                <Button variant="link" className="p-0 me-2" title="Edit">
+              <Button variant="link" className="p-0 me-2" title="Edit" onClick={() => handleShowEditModal(course.id)}>
                   <FaEdit color="blue" />
                 </Button>
-                <Button variant="link" className="p-0" title="Assign">
+                <Button
+                  variant="link"
+                  className="p-0"
+                  title="Assign"
+                  onClick={() => handleShowAssignModal(course.id)}
+                >
                   <FaUserPlus color="green" />
                 </Button>
               </td>
@@ -65,6 +94,21 @@ const CourseTable = () => {
           ))}
         </tbody>
       </Table>
+      {selectedCourseId && (
+        <AssignCourseModal
+          show={showAssignModal}
+          handleClose={handleCloseAssignModal}
+          courseId={selectedCourseId}
+        />
+      )}
+      {selectedCourseId && (
+        <EditCourseModal
+          show={showEditModal}
+          handleClose={handleCloseEditModal}
+          courseId={selectedCourseId}
+        />
+      )}
+
     </Container>
   );
 };

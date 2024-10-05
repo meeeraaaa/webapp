@@ -30,8 +30,9 @@ export const getCourses = async (req, res) => {
         },
         progress: {
           select: {
-            userId: true, // We only need userId to count
+            userId: true, 
           },
+          distinct: ['userId'],
         },
       },
     });
@@ -154,5 +155,32 @@ export const assignCourseToEmployee = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+// Get employees assigned to a specific course
+export const getAssignedEmployees = async (req, res) => {
+  const { courseId } = req.params;
+
+  try {
+    // Fetch employees already assigned to the course
+    const progressEntries = await prisma.progress.findMany({
+      where: {
+        courseId: parseInt(courseId, 10),
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const assignedEmployees = progressEntries.map((entry) => entry.user);
+    res.status(200).json(assignedEmployees);
+  } catch (error) {
+    console.error('Error fetching assigned employees:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
