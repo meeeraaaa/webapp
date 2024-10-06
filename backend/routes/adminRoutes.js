@@ -3,14 +3,14 @@ import express from "express";
 import {
   addEmployee,
   getEmployees,
-  getEmployeeCourses
+  getEmployeeCourses,
+  getEmployeeProgress
 } from '../controllers/adminController.js';
 
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
 import { addCourse, assignCourseToEmployee, getCourses, getSkills, updateCourse,getAssignedEmployees,getCourseById
 } from "../controllers/courseController.js";
 import { getDesignations } from '../controllers/designationController.js';
-
 const router = express.Router();
 
 router.post("/add-employee", addEmployee);
@@ -28,7 +28,9 @@ router.get("/courses/:courseId/employees",getAssignedEmployees);
 router.get('/course/:id', getCourseById);
 
 
-router.get('/designations', getDesignations);
+router.get('/designations', getDesignations, authorizeAdmin);
 //add employee detail route.
-router.get('/employees/:id/courses', getEmployeeCourses);
+router.get('/employees/:id/courses', getEmployeeCourses, authorizeAdmin);
+router.get('/employees/:id/progress', getEmployeeProgress, authorizeAdmin); 
+
 export default router;

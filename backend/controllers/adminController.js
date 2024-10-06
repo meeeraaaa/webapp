@@ -112,3 +112,27 @@ export const getEmployees = async (req, res) => {
   }
 };
 
+export const getEmployeeProgress = async (req, res) => {
+  const { id: employeeId } = req.params; // Destructure the id directly
+  try {
+      const progressData = await prisma.progress.findMany({
+          where: { userId: Number(employeeId) }, // Ensure employeeId is a number
+          include: {
+              course: true, // Include course details
+          },
+      });
+
+      // Transform data into a structure suitable for the chart
+      const response = progressData.map(entry => ({
+          date: entry.updatedAt.toISOString().split('T')[0], // Extract date
+          courseTitle: entry.course.title, // Course title
+          percentage_completed: entry.percentage_completed,
+          chapters_completed: entry.chapters_completed,
+      }));
+
+      return res.status(200).json(response);
+  } catch (error) {
+      console.error('Error fetching employee progress:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+  }
+};
