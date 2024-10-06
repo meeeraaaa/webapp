@@ -1,4 +1,3 @@
-// AssignCourseModal.js
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import Multiselect from 'multiselect-react-dropdown';
@@ -13,6 +12,7 @@ const AssignCourseModal = ({ show, handleClose, courseId }) => {
     const fetchEmployees = async () => {
       try {
         const token = localStorage.getItem('token');
+
         // Fetch employees
         const employeesResponse = await axios.get('http://localhost:1200/admin/employees', {
           headers: { Authorization: `Bearer ${token}` },
@@ -24,7 +24,8 @@ const AssignCourseModal = ({ show, handleClose, courseId }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const assignedEmployeeIds = assignedEmployeesResponse.data.map((employee) => employee.userId);
+        // Map the assigned employees to their IDs
+        const assignedEmployeeIds = assignedEmployeesResponse.data.map((employee) => employee.id); // Ensure you're accessing the correct field
 
         // Filter out employees already assigned to the course
         const availableEmployees = employeesResponse.data.filter(

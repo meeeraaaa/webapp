@@ -97,25 +97,50 @@ export const addCourse = async (req, res) => {
   }
 };
 
-
-// Edit an existing course
-export const updateCourse = async (req, res) => {
-  const { id } = req.params; // Course ID from the URL
-  const { title, difficulty_level, no_of_chapters, duration, skillIds } = req.body; // Updated fields
+// Get a specific course by its ID
+export const getCourseById = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    // Check if all provided skill IDs exist
-    const skills = await prisma.skill.findMany({
-      where: {
-        id: {
-          in: skillIds,
+    const course = await prisma.course.findUnique({
+      where: { id: parseInt(id, 10) },
+      include: {
+        skills: {
+          include: {
+            skill: true, // Include the skill details
+          },
         },
       },
     });
 
-    if (skills.length !== skillIds.length) {
-      return res.status(400).json({ message: "One or more skill IDs are invalid." });
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
     }
+
+    // Structure the response to match your format
+    const response = {
+      id: course.id,
+      title: course.title,
+      difficulty_level: course.difficulty_level,
+      no_of_chapters: course.no_of_chapters,
+      duration: course.duration,
+      createdAt: course.createdAt,
+      skills: course.skills.map(courseSkill => courseSkill.skill.name), // Get skill names
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching course:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateCourse = async (req, res) => {
+  const { id } = req.params; // Course ID from the URL
+  const { title, difficulty_level, no_of_chapters, duration} = req.body; // Updated fields
+
+  try {
+   
 
     const updatedCourse = await prisma.course.update({
       where: { id: Number(id) }, // Find the course by ID
@@ -123,10 +148,8 @@ export const updateCourse = async (req, res) => {
         title,
         difficulty_level,
         no_of_chapters,
-        duration,
-        skills: {
-          connect: skillIds.map(skillId => ({ id: skillId })),
-        },
+        duration
+        
       },
     });
 
@@ -177,7 +200,11 @@ export const getAssignedEmployees = async (req, res) => {
       },
     });
 
-    const assignedEmployees = progressEntries.map((entry) => entry.user);
+    // Use a Set to filter out duplicate employees
+    const assignedEmployees = Array.from(new Set(
+      progressEntries.map((entry) => JSON.stringify(entry.user))
+    )).map((user) => JSON.parse(user));
+
     res.status(200).json(assignedEmployees);
   } catch (error) {
     console.error('Error fetching assigned employees:', error);

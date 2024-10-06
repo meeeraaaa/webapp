@@ -1,0 +1,41 @@
+export const getDepartmentStats = async (req, res) => {
+  try {
+    // Fetch all departments
+    const departments = await prisma.department.findMany({
+      include: {
+        employees: {
+          include: {
+            courses: {
+              where: {
+                percentage_completed: { lt: 100 } // Filter courses that are not completed
+              },
+              select: {
+                id: true // Include the course ID to track the count
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Map the departments to calculate the stats
+    const departmentStats = departments.map(department => {
+      const totalEmployees = department.employees.length;
+      
+      // Count employees who are enrolled in at least one course that isn't completed
+      const employeesWithIncompleteCourses = department.employees.filter(employee => employee.courses.length > 0).length;
+
+      return {
+        department: department.name,
+        totalEmployees,
+        employeesWithIncompleteCourses
+      };
+    });
+
+    // Send the department stats
+    res.status(200).json(departmentStats);
+  } catch (error) {
+    console.error('Error fetching department stats:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

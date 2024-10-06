@@ -7,8 +7,9 @@ import {
 } from '../controllers/adminController.js';
 
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
-import { addCourse, assignCourseToEmployee, getCourses, getSkills, updateCourse,getAssignedEmployees
+import { addCourse, assignCourseToEmployee, getCourses, getSkills, updateCourse,getAssignedEmployees,getCourseById
 } from "../controllers/courseController.js";
+import { getDesignations } from '../controllers/designationController.js';
 
 const router = express.Router();
 
@@ -24,7 +25,10 @@ router.post("/add-course", authenticateToken, authorizeAdmin, addCourse);
 router.post("/assign-course", authenticateToken, authorizeAdmin, assignCourseToEmployee);
 router.put("/update-course/:id", authenticateToken, authorizeAdmin, updateCourse);
 router.get("/courses/:courseId/employees",getAssignedEmployees);
+router.get('/course/:id', getCourseById);
 
+
+router.get('/designations', getDesignations);
 //add employee detail route.
 router.get('/employees/:id/courses', getEmployeeCourses);
 export default router;

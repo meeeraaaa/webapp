@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./../../styles/App.css";
 import axios from "axios";
 import EmployeeDetailModal from "./EmployeeDetail";  // Import the modal component
+import Navbar from "./../Layout/NavBar";
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]); // State to hold employee data
@@ -54,6 +55,7 @@ const EmployeesList = () => {
 
   return (
     <div className="container mt-5">
+      <Navbar />
       <h2 className="text-center mb-4">Employees List</h2>
       <table className="table table-striped">
         <thead>

@@ -1,7 +1,8 @@
 // src/components/AdminDashboard/AddEmployee.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./../../styles/App.css";
 import axios from "axios"; 
+import Navbar from "./../Layout/NavBar";
 
 const AddEmployee = () => {
   const [user, setEmployee] = useState({
@@ -13,13 +14,21 @@ const AddEmployee = () => {
     sex: "",
   });
 
-  const designationOptions = [
-    { title: 'SDE', id: 26 },
-    { title: 'SDE2', id: 27 },
-    { title: 'Enabler', id: 28 },
-    { title: 'Consultant', id: 29 },
-    { title: 'Architect', id: 30 }
-  ];
+  const [designationOptions, setDesignationOptions] = useState([]);
+
+  // Fetch designation options from the database
+  useEffect(() => {
+    const fetchDesignations = async () => {
+      try {
+        const response = await axios.get("http://localhost:1200/admin/designations");
+        setDesignationOptions(response.data); // Assuming the response is an array of { id, title }
+      } catch (error) {
+        console.error("Error fetching designations:", error);
+      }
+    };
+
+    fetchDesignations();
+  }, []); // Empty dependency array means this runs once when the component mounts
 
   const handleDesignationChange = (e) => {
     const selectedId = e.target.value;
@@ -29,11 +38,9 @@ const AddEmployee = () => {
   const handleChange = (e) => {
     setEmployee({ ...user, [e.target.name]: e.target.value });
   };
-  console.log(user);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Employee to be added");
-    console.log(user);
     
     try {
         const response = await axios.post("http://localhost:1200/admin/add-employee", {
@@ -44,8 +51,9 @@ const AddEmployee = () => {
             sex: user.sex,
             experience: parseInt(user.experience, 10),
         });
-    
+
         console.log(response.data); // response for success
+        // Reset form
         setEmployee({
             name: "",
             email: "",
@@ -56,12 +64,13 @@ const AddEmployee = () => {
         });
     } 
     catch (error) {
-        console.error("Error:", error);
+        console.error("Error adding employee:", error.response ? error.response.data : error.message);
     }
   };
 
   return (
     <div className="container mt-5">
+      <Navbar />
       <h2 className="text-center mb-4">Add New Employee</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group mb-3">
@@ -92,7 +101,7 @@ const AddEmployee = () => {
             className="form-control"
             name="designation"
             value={user.designationId}
-            onChange={handleDesignationChange} // Handle selection change
+            onChange={handleDesignationChange}
             required
           >
             <option value="">Select Designation</option>
