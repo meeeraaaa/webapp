@@ -5,13 +5,15 @@ import {
     completeCourse,
     getUserCourses,
     getUserProfile,
-    getCourseDetails
+    getCourseDetails,
+    getEmployeeProgress
 } from '../controllers/userController.js';
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
 
 const router = express.Router();
 
 router.use(authenticateToken);
+router.get('/:id/course-progress', authenticateToken, authorizeAdmin, getEmployeeProgress);
 
 
 // Route to start a course

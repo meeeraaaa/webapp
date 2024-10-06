@@ -4,7 +4,9 @@ import {
   addEmployee,
   getEmployees,
   getEmployeeCourses,
-  getEmployeeProgress
+  getEmployeeProgress,
+  getCourseCompletionByDesignation,
+  getSkillsByDesignation
 } from '../controllers/adminController.js';
 
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
@@ -16,7 +18,7 @@ const router = express.Router();
 router.post("/add-employee", addEmployee);
 //router.post("/add-employee", authenticateToken, authorizeAdmin, addEmployee);
 router.get("/employees", getEmployees);
-
+router.get("/course/:courseId/completion-status", getCourseCompletionByDesignation);
 
 // Courses
 router.get('/skills', authenticateToken, authorizeAdmin, getSkills);
@@ -26,7 +28,7 @@ router.post("/assign-course", authenticateToken, authorizeAdmin, assignCourseToE
 router.put("/update-course/:id", authenticateToken, authorizeAdmin, updateCourse);
 router.get("/courses/:courseId/employees",getAssignedEmployees);
 router.get('/course/:id', getCourseById);
-
+router.get("/skills/:skillId/designations",getSkillsByDesignation);
 
 router.get('/designations', getDesignations, authorizeAdmin);
 //add employee detail route.

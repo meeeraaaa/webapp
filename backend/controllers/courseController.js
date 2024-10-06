@@ -1,3 +1,4 @@
+//C:\Users\AnanyaSarkar\project\webapp\backend\controllers\courseController.js
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import prisma from '../db.js';

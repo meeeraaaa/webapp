@@ -1,9 +1,16 @@
-// src/components/Layout/Navbar.js
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import "./../../styles/App.css"; // Import global styles
 
 const Navbar = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token from local storage
+    navigate("/"); // Redirect to login page using navigate
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
@@ -24,21 +31,26 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="/employees">
+              <Link className="nav-link custom-nav-link" to="/employees">
                 Employees List
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/add-employee">
+              <Link className="nav-link custom-nav-link" to="/add-employee">
                 Add Employee
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/manage-courses">
+              <Link className="nav-link custom-nav-link" to="/manage-courses">
                 Manage Courses
               </Link>
             </li>
           </ul>
+
+          {/* Logout button on the right end of the navbar */}
+          <button className="btn btn-danger ms-auto" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
     </nav>

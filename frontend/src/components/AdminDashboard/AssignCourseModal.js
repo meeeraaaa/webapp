@@ -15,7 +15,7 @@ const AssignCourseModal = ({ show, handleClose, courseId }) => {
 
         // Fetch employees
         const employeesResponse = await axios.get('http://localhost:1200/admin/employees', {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: ` ${token}` },
         });
 
         // Fetch already assigned employees for this course

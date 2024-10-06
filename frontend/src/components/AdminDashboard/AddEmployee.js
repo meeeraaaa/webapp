@@ -72,7 +72,7 @@ const AddEmployee = () => {
     <div className="container mt-5">
       <Navbar />
       <h2 className="text-center mb-4">Add New Employee</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="add-employee-form">
         <div className="form-group mb-3">
           <label>Name</label>
           <input
@@ -147,7 +147,7 @@ const AddEmployee = () => {
             <option value="f">Female</option>
           </select>
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary custom-btn">
           Add Employee
         </button>
       </form>

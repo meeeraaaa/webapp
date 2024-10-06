@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./../../styles/App.css";
 import axios from "axios";
 import EmployeeDetailModal from "./EmployeeDetail"; 
 import Navbar from "./../Layout/NavBar";
@@ -44,11 +43,11 @@ const EmployeesList = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="text-center alert alert-danger">{error}</div>;
   }
 
   return (
@@ -74,7 +73,7 @@ const EmployeesList = () => {
                 <td>{new Date(user.joindate).toLocaleDateString()}</td>
                 <td>{user.designation.title}</td>
                 <td>
-                  <button className="btn btn-info" onClick={() => fetchEmployeeCourses(user.id)}>
+                  <button className="btn btn-info custom-btn" onClick={() => fetchEmployeeCourses(user.id)}>
                     View Employee
                   </button>
                 </td>

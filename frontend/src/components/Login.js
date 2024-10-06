@@ -1,4 +1,4 @@
-//C:\Users\AnanyaSarkar\Documents\project\webapp\frontend\src\components\Login.js
+// Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -20,19 +20,20 @@ const Login = () => {
       });
 
       const { token, user } = response.data;
-      localStorage.setItem("token", token); 
+      // Save the token and userId in localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", user.id); // Save userId
+
       if (user.role === "admin") {
         navigate("/admin-dashboard");
-      } 
-       else {
+      } else {
         navigate("/user-dashboard");
-       }
+      }
     } catch (error) {
       console.log("Login failed. Please check your credentials.");
       console.error(error);
     }
   };
-
 
   return (
     <div className="login-container d-flex align-items-center justify-content-center">
@@ -77,7 +78,6 @@ const Login = () => {
               Login
             </button>
           </form>
-          
         </div>
       </div>
     </div>

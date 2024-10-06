@@ -153,7 +153,6 @@ export const completeCourse = async (req, res) => {
 };
 
 export const getUserProfile = async (req, res) => {
-    //const userId = req.user?.id;
     const userId = req.user.id; // Assume req.user is always set by middleware
 
     if (!userId) {
@@ -171,12 +170,12 @@ export const getUserProfile = async (req, res) => {
                 skills: { select: { skill: { select: { name: true } } } },
                 progress: {
                     where: {
-                        percentage_completed: 100, // Fetch only completed courses
+                        percentage_completed: 100,
                     },
                     orderBy: {
                         updatedAt: 'desc',
                     },
-                    distinct: ['courseId'], // Get only one entry per course
+                    distinct: ['courseId'],
                     include: {
                         course: {
                             select: {
@@ -205,14 +204,45 @@ export const getUserProfile = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 mail: user.mail,
-                designation: user.designation.title ,
-                skills: user.skills.map(skill => skill.skill.name),
+                designation: user.designation.title,
+                skills: user.skills.map(skill => skill.skill.name) || [],
                 completedCourses
             }
         });
     } catch (error) {
         console.error("Error fetching user profile:", error.message);
         return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const getEmployeeProgress = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Fetch all progress entries for the user
+        const progressData = await prisma.progress.findMany({
+            where: {
+                userId: Number(id),
+            },
+            include: {
+                course: {
+                    select: {
+                        title: true,
+                    },
+                },
+            },
+        });
+
+        // Map the data to include the course title and update date
+        const formattedData = progressData.map((entry) => ({
+            courseTitle: entry.course.title,
+            updatedAt: entry.updatedAt, // Keep using updatedAt to show progress dates
+        }));
+
+        res.json(formattedData);
+    } catch (error) {
+        console.error("Error fetching employee progress:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 

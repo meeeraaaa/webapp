@@ -5,10 +5,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 const CourseDetails = () => {
     const { id } = useParams(); // courseId from URL
     const [course, setCourse] = useState(null);
-    const [completedChapters, setCompletedChapters] = useState(0); // number of chapters completed
-    const [isLoading, setIsLoading] = useState(true); 
+    const [completedChapters, setCompletedChapters] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    // const [userName, setUserName] = useState('');
     const [courseSkills, setCourseSkills] = useState([]);
     const [difficultyLevel, setDifficultyLevel] = useState('');
 
@@ -23,31 +22,25 @@ const CourseDetails = () => {
             }
 
             try {
-                // course details and user's progress
                 const response = await axios.get(`http://localhost:1200/user/course/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                console.log('this is what i am getting' ,response.data); 
-                // const { course, progress, user  } = response.data;
-                const { course, progress  } = response.data;
+                const { course, progress } = response.data;
                 setCourse(course);
-                setCompletedChapters(progress.chapters_completed || 0); 
-                // setUserName(user.name); 
-                //setCourseSkills(course.skills.map(courseSkill => courseSkill.skill.name)); // course skills
+                setCompletedChapters(progress.chapters_completed || 0);
                 if (Array.isArray(course.skills)) {
-                    setCourseSkills(course.skills.map(courseSkill => courseSkill.skill.name)); // course skills
+                    setCourseSkills(course.skills.map(courseSkill => courseSkill.skill.name));
                 } else {
-                    setCourseSkills([]); // or handle the case when there are no skills
+                    setCourseSkills([]);
                 }
-                
-                setDifficultyLevel(course.difficulty_level); 
+
+                setDifficultyLevel(course.difficulty_level);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching course details', error);
                 setError('Failed to fetch course details. Please try again later.');
-            }
-            finally {
+            } finally {
                 setIsLoading(false);
             }
         };
@@ -55,29 +48,21 @@ const CourseDetails = () => {
         fetchCourseDetails();
     }, [id, navigate]);
 
-    // Handle when user checks off chapters
     const handleChapterProgress = async (chapter) => {
         const token = localStorage.getItem('token');
-        // const userId = localStorage.getItem('userId');
-        console.log(localStorage.getItem('token'));
-        // console.log(localStorage.getItem('userId'));
-
-        // Check for token and userId
         if (!token) {
             console.warn("User is not authenticated. Redirecting to login.");
             navigate('/');
-            return; // stop further execution
+            return;
         }
-    
-        // Proceed to update chapter progress
+
         if (chapter > completedChapters) {
             try {
                 setCompletedChapters(chapter);
-    
+
                 await axios.put('http://localhost:1200/user/update-progress', {
-                    // userId: userId,
                     courseId: id,
-                    chaptersCompleted: chapter - completedChapters // only marking one chapter as completed
+                    chaptersCompleted: chapter - completedChapters
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -87,40 +72,57 @@ const CourseDetails = () => {
             }
         }
     };
+
     if (isLoading) {
-        return <div>Loading course details...</div>;
+        return <div className="loading-message">Loading course details...</div>;
     }
 
     if (error) {
-        return <div>{error}</div>; 
+        return <div className="error-message">{error}</div>;
     }
 
-    //  "Done" button - redirect user
-    const handleDone = () => {
-        alert('Progress saved!');
-        navigate('/user-dashboard'); // dashboard after completion
+    const handleDone = async () => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem("userId");
+
+        if (!token) {
+            console.warn("User is not authenticated. Redirecting to login.");
+            navigate('/');
+            return;
+        }
+    
+        try {
+            await axios.post('http://localhost:1200/user/complete-course', {
+                userId: userId, // You need to get the logged-in user's ID
+                courseId: id
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert('Course completed and skills updated!');
+            navigate('/user-dashboard');
+        } catch (error) {
+            console.error('Error completing course', error);
+            alert('Failed to complete the course. Please try again.');
+        }
     };
-
-    if (isLoading) return <p>Loading...</p>;
-
+    
     return (
         <div className="course-details">
-            <h1>{course.title}</h1>
-            {/* <p>User: {userName}</p>  */}
-            <p>Difficulty Level: {difficultyLevel}</p> 
-            <p>Skills: {courseSkills.join(', ')}</p> 
-            
+            <h1 className="course-title">{course.title}</h1>
+            <p className="difficulty-level"><strong>Difficulty Level:</strong> {difficultyLevel}</p>
+            <p className="skills"><strong>Skills:</strong> {courseSkills.join(', ')}</p>
+
             <div className="chapter-list">
                 <h2>Chapters</h2>
                 <ul>
                     {Array.from({ length: course.no_of_chapters }, (_, i) => (
-                        <li key={i}>
+                        <li key={i} className="chapter-item">
                             <label>
                                 <input
                                     type="checkbox"
-                                    checked={i < completedChapters} // Mark the checkbox as checked if the chapter is completed
+                                    checked={i < completedChapters}
                                     onChange={() => handleChapterProgress(i + 1)}
-                                    disabled={i + 1 > completedChapters + 1} // Only allow the next chapter to be checked
+                                    disabled={i + 1 > completedChapters + 1}
                                 />
                                 Chapter {i + 1}
                             </label>

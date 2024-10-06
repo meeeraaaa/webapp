@@ -51,6 +51,7 @@ a:hover {
   height: auto;
   border-radius: 10px;
 }
+
 .navbar {
   margin-bottom: 30px;
 }
@@ -69,7 +70,6 @@ a:hover {
   z-index: 1; 
   letter-spacing: 0.5rem; 
 }
-
 
 .login-form {
   flex: 1;
@@ -97,4 +97,537 @@ a:hover {
 
 .btn-primary:hover {
   background-color: #2980b9;
+}
+
+/* General Container Styles for Admin Dashboard */
+.container {
+  background-color: #ffffff; /* white background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Admin Dashboard Title and Subtitle Styles */
+.title {
+  color: #333333; /* dark grey for better readability */
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.btn-danger {
+  background-color: #E74C3C; /* Custom red color */
+  border: none; /* Remove border */
+}
+
+.btn-danger:hover {
+  background-color: #C0392B; /* Darker red on hover */
+}
+
+.subtitle {
+  color: #666666; /* lighter grey for subtitle */
+  font-size: 16px;
+}
+
+/* Card Styles */
+.card-custom {
+  background-color: #fff; /* card background */
+  border: 1px solid #e0e0e0; /* subtle border */
+  border-radius: 8px;
+  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s; /* smooth transition */
+  cursor: pointer; /* change cursor to pointer */
+}
+
+.card-custom:hover {
+  transform: translateY(-5px); /* lift effect on hover */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* enhanced shadow on hover */
+  background-color: #EDFAFF; /* light accent color on hover */
+}
+
+.card-custom:active {
+  transform: translateY(1px); /* slight drop effect on click */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* reduce shadow on click */
+}
+
+.card-title {
+  color: #333333; /* dark title */
+  transition: color 0.3s; /* smooth transition for color */
+}
+
+.card-title:hover {
+  color: #C04D62; /* accent color on hover */
+}
+
+.card-text {
+  color: #777777; /* medium grey for card text */
+  transition: color 0.3s; /* smooth transition for color */
+}
+
+.card-text:hover {
+  color: #555555; /* darker grey on hover */
+}
+
+/* Alert Styles */
+.alert-danger {
+  background-color: #EDFAFF; /* Light color for errors */
+  color: #d9534f; /* Bootstrap's danger color */
+}
+
+/* Row Styles */
+.row {
+  margin-top: 20px; /* spacing between rows */
+}
+
+/* Component Styles */
+.skills-container,
+.population-container,
+.course-completion-container {
+  padding: 20px;
+  background-color: #ffffff; /* white background */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px; /* space above component */
+}
+
+/* Titles for Skills and Population Components */
+.skills-title,
+.population-title {
+  color: #333333; /* dark grey for title */
+  font-size: 24px; /* larger title font */
+  margin-bottom: 15px; /* space below title */
+}
+
+/* Dropdown Styles */
+.skills-dropdown,
+.courses-dropdown,
+.dropdown-label {
+  padding: 10px;
+  border: 1px solid #e0e0e0; /* subtle border */
+  border-radius: 5px;
+  background-color: #ffffff; /* white background */
+  transition: border-color 0.3s, box-shadow 0.3s; /* smooth transition */
+  cursor: pointer; /* change cursor to pointer */
+  width: 100%; /* make dropdown full width */
+  margin-bottom: 20px; /* space between dropdown and chart */
+}
+
+.skills-dropdown:hover,
+.courses-dropdown:hover,
+.dropdown-label:hover {
+  border-color: #C04D62; /* accent color on hover */
+  box-shadow: 0 0 5px rgba(192, 77, 98, 0.5); /* subtle shadow on hover */
+}
+
+.skills-dropdown:focus,
+.courses-dropdown:focus,
+.dropdown-label:focus {
+  outline: none; /* remove default outline */
+  border-color: #C04D62; /* accent border color on focus */
+  box-shadow: 0 0 5px rgba(192, 77, 98, 0.5); /* subtle shadow on focus */
+}
+
+/* Chart Container Styles */
+.chart-container {
+  transition: transform 0.3s; /* smooth transition */
+}
+
+.chart-container:hover {
+  transform: scale(1.02); /* slight zoom effect on hover */
+}
+
+.chart-container:active {
+  transform: scale(0.98); /* slight shrink effect on click */
+}
+
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: relative; /* Position relative for dropdown options */
+  cursor: pointer; /* Pointer cursor */
+  margin-bottom: 20px; /* Space between dropdown and chart */
+}
+
+.dropdown-options {
+  position: absolute; /* Position absolute for dropdown options */
+  background-color: #ffffff; /* White background */
+  border: 1px solid #e0e0e0; /* Subtle border */
+  border-radius: 5px;
+  width: 100%; /* Full width */
+  max-height: 200px; /* Limit height */
+  overflow-y: auto; /* Scrollable if too many options */
+  z-index: 1000; /* Ensure options are on top */
+}
+
+.dropdown-option {
+  padding: 10px;
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.dropdown-option:hover {
+  background-color: #FFF2F1; /* Highlight color on hover */
+}
+
+/* Employees List Styles */
+.table {
+  background-color: #ffffff; /* White background for the table */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.table th, .table td {
+  padding: 15px; /* Increased padding for better spacing */
+  text-align: center; /* Center align text */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9; /* Alternate row color */
+}
+
+.table-striped tbody tr:hover {
+  background-color: #FFF2F1; /* Highlight row on hover */
+}
+
+.custom-btn {
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+}
+
+.custom-btn:hover {
+  background-color: #CFC9FF; /* Button hover color */
+  transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+/* Ensure specificity for employee table styles if needed */
+.table.employee-table {
+  width: 100%; /* Full width for the employee table */
+}
+
+.table.employee-table th {
+  background-color: #CFC9FF; /* Header background color */
+  color: #333; /* Header text color */
+}
+
+.table.employee-table td {
+  color: #666; /* Body text color */
+}
+/* AddEmployee Component Styles */
+.add-employee-form {
+  background-color: #ffffff; /* White background for the form */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 20px; /* Padding inside the form */
+}
+
+/* Form Group Styles */
+.form-group {
+  margin-bottom: 20px; /* Space between form groups */
+}
+
+/* Label Styles */
+.form-group label {
+  display: block; /* Ensure label is block for spacing */
+  font-weight: 600; /* Bold labels */
+  margin-bottom: 5px; /* Space below labels */
+}
+
+/* Input and Select Styles */
+.form-control {
+  border: 1px solid #e0e0e0; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px; /* Padding inside inputs */
+  transition: border-color 0.3s; /* Smooth transition for focus effect */
+  width: 100%; /* Full width for inputs */
+}
+
+/* Input Focus Styles */
+.form-control:focus {
+  border-color: #C04D62; /* Accent color on focus */
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 5px rgba(192, 77, 98, 0.5); /* Subtle shadow on focus */
+}
+
+/* Dropdown Option Styles */
+.form-control option {
+  padding: 10px; /* Space for dropdown options */
+  background-color: #ffffff; /* White background for options */
+  color: #333; /* Text color for options */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for dropdown options */
+.form-control option:hover {
+  background-color: #FFF2F1; /* Highlight color on hover */
+  color: #C04D62; /* Change text color on hover for better contrast */
+}
+
+/* Button Styles */
+.btn {
+  background-color: #3498db; /* Primary button color */
+  border: none; /* Remove border */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding for button */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+}
+
+/* Button Hover Effect */
+.btn:hover {
+  background-color: #2980b9; /* Darker shade on hover */
+}
+
+/* Button Active Effect */
+.btn:active {
+  transform: scale(0.98); /* Slight shrink effect on click */
+}
+
+/* Navbar Style (if needed) */
+.navbar {
+  margin-bottom: 30px; /* Space below navbar */
+}
+
+/* Title Styles */
+h2 {
+  color: #333333; /* Dark grey for title */
+  font-size: 28px; /* Font size */
+  font-weight: 600; /* Bold */
+  margin-bottom: 20px; /* Space below title */
+}
+
+/* ManageCourses.css */
+
+/* Heading Styles */
+.table-heading {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: space-between; /* Space between title and button */
+  align-items: center; /* Center items vertically */
+  margin-bottom: 20px; /* Space below the heading */
+  color: #333; /* Dark grey for the heading */
+}
+
+/* Add Course Button Styles */
+.add-course-button {
+  margin-left: auto; /* Push button to the right */
+}
+
+.add-course-button button {
+  background-color: #CFC9FF; /* Light purple for the button background */
+  color: #333; /* Dark grey for text */
+  border: none; /* Remove border */
+  padding: 10px 15px; /* Add padding */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.add-course-button button:hover {
+  background-color: #B0A1E0; /* Darker shade on hover */
+  transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+/* Course Table Styles */
+.course-table {
+  background-color: #ffffff; /* White background for the table */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.table th, .table td {
+  padding: 15px; /* Increased padding for better spacing */
+  text-align: center; /* Center align text */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9; /* Alternate row color */
+}
+
+.table-striped tbody tr:hover {
+  background-color: #FFF2F1; /* Highlight row on hover */
+}
+.user-dashboard {
+  background-color: #f9f9f9; /* Light background for contrast */
+  padding: 20px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.dashboard-title {
+  color: #333; /* Dark text for title */
+  text-align: center; /* Center the title */
+}
+
+.user-nav {
+  display: flex;
+  justify-content: space-between; /* Space between buttons */
+}
+
+.course-list {
+  margin-top: 20px; /* Space above the course list */
+}
+
+.course-items {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+}
+
+.course-item {
+  background-color: #fff; /* White background for course items */
+  border: 1px solid #ddd; /* Light border */
+  padding: 15px; /* Padding for content */
+  margin-bottom: 10px; /* Space between course items */
+  border-radius: 5px; /* Rounded corners for course items */
+  transition: box-shadow 0.3s; /* Smooth shadow transition */
+}
+
+.course-item:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+}
+.profile {
+  background-color: #f8f9fa; /* Light background for the profile */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-title {
+  color: #3c3c3c; /* Dark color for the title */
+  margin-bottom: 20px;
+}
+
+.skills-list, .courses-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.skill-item, .course-item {
+  background-color: #CFC9FF; /* The color from your theme */
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.course-item a {
+  color: #FF6F61; /* A color that stands out for links */
+}
+
+.course-item a:hover {
+  text-decoration: underline; /* Underline on hover for links */
+}
+/* CourseDetails.css */
+.course-details {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.course-title {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.difficulty-level, .skills {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.chapter-list {
+  margin-top: 20px;
+}
+
+.chapter-item {
+  margin-bottom: 8px;
+}
+
+.chapter-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.done-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.done-button:hover {
+  background-color: #45a049;
+}
+
+.loading-message, .error-message {
+  font-size: 18px;
+  color: #f00; /* Red for errors */
+}
+/* UserDashboard.css */
+
+/* General dashboard styling */
+.user-dashboard {
+  margin-top: 20px;
+}
+
+/* Calendar styling */
+.react-calendar {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #FFF; /* White background for the calendar */
+}
+
+/* Style for the highlighted dates */
+.highlighted-date {
+  background-color: rgba(207, 201, 255, 0.8); /* Light purple for highlighted dates */
+  border-radius: 50%;
+  color: #000; /* Black text for contrast */
+}
+
+/* Header styles */
+.react-calendar__navigation {
+  background-color: #CFC9FF; /* Light purple for the header */
+  border-radius: 10px;
+  color: #000; /* Black text for the header */
+}
+
+/* Day styles */
+.react-calendar__month-view__days__day {
+  border-radius: 10px;
+  padding: 10px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.react-calendar__month-view__days__day:hover {
+  background-color: rgba(255, 242, 241, 0.7); /* Light pink on hover */
+  color: #000; /* Black text on hover */
+}
+
+/* Navigation buttons styles */
+.react-calendar__navigation button {
+  background-color: transparent; /* Transparent background */
+  color: #000; /* Black text */
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.react-calendar__navigation button:hover {
+  background-color: rgba(207, 201, 255, 0.5); /* Light purple on hover */
+}
+
+/* Today’s date styling */
+.react-calendar__tile--now {
+  background-color: rgba(255, 242, 241, 0.5); /* Light pink for today's date */
+  border-radius: 50%; /* Circle shape for today's date */
+  color: #000; /* Black text for contrast */
+}
+
+/* Disable pointer events for highlighted dates */
+.react-calendar__tile--highlighted {
+  pointer-events: none; /* Disable click for highlighted dates */
 }

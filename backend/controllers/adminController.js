@@ -3,8 +3,99 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import prisma from'../db.js';
 
-// Get courses for a specific employee with progress and course details
-// Get courses for a specific employee with progress and course details
+// controllers/adminController.js
+
+export const getCourseCompletionByDesignation = async (req, res) => {
+  const { courseId } = req.params; // Get course ID from the request parameters
+
+  try {
+    // Fetch all designations
+    const designations = await prisma.designation.findMany({
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    // Create a result array to store counts of completed vs not completed employees per designation
+    const completionData = [];
+
+    for (const designation of designations) {
+      // Get employees under each designation
+      const employees = await prisma.user.findMany({
+        where: { designationId: designation.id },
+        select: {
+          id: true,
+        },
+      });
+
+      // Check how many employees have completed the course (percentage_completed = 100)
+      const completedCount = await prisma.progress.count({
+        where: {
+          courseId: parseInt(courseId, 10),
+          userId: { in: employees.map((emp) => emp.id) },
+          percentage_completed: 100,
+        },
+      });
+
+      // Total employees assigned to this course
+      const totalAssigned = await prisma.progress.count({
+        where: {
+          courseId: parseInt(courseId, 10),
+          userId: { in: employees.map((emp) => emp.id) },
+        },
+      });
+
+      // Calculate non-completed employees
+      const notCompletedCount = totalAssigned - completedCount;
+
+      completionData.push({
+        designation: designation.title,
+        completed: completedCount,
+        notCompleted: notCompletedCount,
+      });
+    }
+
+    res.status(200).json(completionData);
+  } catch (error) {
+    console.error('Error fetching course completion by designation:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const getSkillsByDesignation = async (req, res) => {
+  const skillId = parseInt(req.params.skillId);
+
+  try {
+      // Check if the skillId is valid
+      if (isNaN(skillId)) {
+          return res.status(400).json({ error: 'Invalid skill ID' });
+      }
+
+      // Fetch count of employees for the given skill grouped by designation
+      const data = await prisma.userSkill.groupBy({
+          by: ['designationId'],
+          where: { skillId: skillId },
+          _count: {
+              userId: true, // Count the number of users having this skill
+          },
+          include: {
+              designation: true, // Include designation details
+          },
+      });
+
+      // Map the results to the desired format
+      const result = data.map(item => ({
+          designation: item.designation.title, // Get designation title
+          count: item._count.userId, // Get the count of users
+      }));
+
+      // Return the result as a JSON response
+      res.json(result);
+  } catch (error) {
+      console.error('Error fetching skills by designation:', error);
+      res.status(500).json({ error: 'Something went wrong' });
+  }
+};
 export const getEmployeeCourses = async (req, res) => {
   const { id } = req.params; // Extract employee ID from the request parameters
 

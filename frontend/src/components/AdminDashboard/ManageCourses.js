@@ -10,12 +10,17 @@ const ManageCourses = () => {
       <Navbar />
       <Row className="mb-3">
         <Col>
-          <AddCourse /> 
+          <div className="table-heading">
+            <h2>Manage Courses</h2>
+            <div className="add-course-button">
+              <AddCourse />
+            </div>
+          </div>
         </Col>
       </Row>
       <Row>
         <Col>
-          <CourseTable /> 
+          <CourseTable />
         </Col>
       </Row>
     </div>
