@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import prisma from '../db.js';
 
+const pt=44;
 
 export const getSkills = async (req, res) => {
   try {
@@ -166,8 +167,18 @@ export const assignCourseToEmployee = async (req, res) => {
   const { courseId, userId } = req.body;
 
   try {
+    // Fetch the current highest ID in the progress table
+    const lastProgressEntry = await prisma.progress.findFirst({
+      orderBy: { id: 'desc' } // Get the highest current ID
+    });
+
+    // Determine the next ID, starting from the highest existing ID + 1, or default to 1 if the table is empty
+    const nextId = lastProgressEntry ? lastProgressEntry.id + 1 : 1;
+
+    // Create the progress entry for the user and course, explicitly setting the ID
     const progress = await prisma.progress.create({
       data: {
+        id: nextId, // Set the next ID for the new entry
         course: { connect: { id: courseId } },
         user: { connect: { id: userId } },
         chapters_completed: 0,
@@ -181,6 +192,8 @@ export const assignCourseToEmployee = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 // Get employees assigned to a specific course
 export const getAssignedEmployees = async (req, res) => {
   const { courseId } = req.params;

@@ -66,7 +66,7 @@ const EmployeeDetailModal = ({ employeeId, employeeName, onClose }) => {
           {/* Create lines for each course title */}
           {Array.from(new Set(chartData.map(item => item.courseTitle))).map((courseTitle, index) => (
             <Line
-              key={courseTitle} // Use course title as key
+              key={courseTitle} // course title as key
               type="monotone"
               dataKey={item => item.courseTitle === courseTitle ? item.percentage_completed : null}
               stroke={['#8CE0FF', '#FDB0C2', '#9BE69B', '#C0B6FF'][index % 4]} // Corresponding colors for lines

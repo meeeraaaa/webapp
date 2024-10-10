@@ -582,10 +582,10 @@ h2 {
 
 /* Style for the highlighted dates */
 .highlighted-date {
-  background-color: rgba(207, 201, 255, 0.8); /* Light purple for highlighted dates */
+  background-color: #CFC9FF !important; /* Or any color from your theme */
   border-radius: 50%;
-  color: #000; /* Black text for contrast */
 }
+
 
 /* Header styles */
 .react-calendar__navigation {

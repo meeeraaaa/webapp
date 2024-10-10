@@ -14,6 +14,9 @@ export const login = async (req, res) => {
       where: { mail: email },
     });
 
+    
+    
+    
     // If user not found
     if (!user|| !await bcrypt.compare(password, user.Hashedpassword)) {
       return res.status(401).json({ error: "Invalid email or password" });

@@ -8,7 +8,6 @@ import 'react-calendar/dist/Calendar.css'; // Import calendar styles
 const UserDashboard = () => {
     const [courses, setCourses] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [courseProgress, setCourseProgress] = useState([]); // State for course progress
     const [markedDates, setMarkedDates] = useState([]); // State for marked dates
     const navigate = useNavigate();
 
@@ -40,10 +39,16 @@ const UserDashboard = () => {
                 const progressResponse = await axios.get(`http://localhost:1200/user/${userId}/course-progress`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setCourseProgress(progressResponse.data);
+
+                // Log progress data to verify the date formats
+                console.log('Progress data:', progressResponse.data);
 
                 // Prepare marked dates for calendar
-                const dates = progressResponse.data.map(progress => new Date(progress.updatedAt).toDateString());
+                const dates = progressResponse.data.map(progress => {
+                    const date = new Date(progress.updatedAt);
+                    console.log('Processed date:', date.toDateString()); // Log each date
+                    return date.toDateString(); // Return the date in string format
+                });
                 setMarkedDates(dates);
             } catch (error) {
                 console.error('Error fetching data', error);
@@ -55,6 +60,7 @@ const UserDashboard = () => {
 
     // Function to check if a date is marked
     const tileClassName = ({ date }) => {
+        console.log('Calendar date:', date.toDateString()); // Log the calendar date
         if (markedDates.includes(date.toDateString())) {
             return 'highlighted-date'; // Apply a specific class for highlighted dates
         }

@@ -1,64 +1,60 @@
-      <form onSubmit={handleCourseSubmit}>
-        <div className="form-group">
-          <label>Course Title</label>
-          <input
-            type="text"
-            className="form-control"
-            value={newCourse.title}
-            onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Difficulty Level</label>
-          <select
-            className="form-control"
-            value={newCourse.difficulty_level}
-            onChange={(e) => setNewCourse({ ...newCourse, difficulty_level: e.target.value })}
-          >
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Number of Chapters</label>
-          <input
-            type="number"
-            className="form-control"
-            value={newCourse.no_of_chapters}
-            onChange={(e) => setNewCourse({ ...newCourse, no_of_chapters: e.target.value })}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Duration (hours)</label>
-          <input
-            type="number"
-            className="form-control"
-            value={newCourse.duration}
-            onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Skills</label>
-          <select
-            multiple
-            className="form-control"
-            value={newCourse.skills}
-            onChange={(e) => setNewCourse({ ...newCourse, skills: [...e.target.selectedOptions].map(option => option.value) })}
-          >
-            {skills.map(skill => (
-              <option key={skill.id} value={skill.id}>{skill.name}</option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" className="btn btn-primary">
-          {editCourseId ? "Update Course" : "Add Course"}
-        </button>
-        {editCourseId && <button onClick={resetCourseForm} className="btn btn-secondary ml-2">Cancel</button>}
-      </form>
+backend/
+    controllers/
+    middleware/
+    prisma/
+    routes/
+    db.js
+    server.js
+frontend
+    src/
+      assets/
+      components/
+        Login.js
+        AdminDashboard/
+          Charts/
+            CourseCompletionChart.js
+            PopulationCountByDesignation.js
+            SkillsByDesignation.js
+          Dashboard.js
+          DashboardGraphics.js
+          AddCourseModal.js
+          AddEmployee.js
+          AssignCourseModal.js
+          CourseTable.js
+          EditCourseModal.js
+          EmployeeDetail.js
+          EmployeeList.js
+          ManageCourses.js
+        Layout/
+          UserNavBar.js
+          NavBar.js
+        UserDashboard/
+          Profile.js
+          UserCourse.js (where they attempt a course)
+          UserDashboard.js
+      styles/
+        App.css
+      App.js
+this is my problem statement "Course Completion and Learning Path Optimization"
+
+Overview:
+Develop a module that monitors employee progress in learning paths and course completions
+
+Design & Build:
+
+- Build course progress dashboards for employees to track their current enrollments, completion rates, and certificates.
+
+- Create admin interfaces to manage learning paths and assign courses to employees.
+
+- Build interactive learning path suggestions based on employee performance.
+
+- Create database tables to store course metadata (title, duration, difficulty level), completion status, and performance metrics."
 
 
-      dps  kalyanpur ek didi (7th class ishita ); sammy ki friend (hevanshi);
+and for the data science part Learning Path Optimization: Use machine learning to recommend optimal learning paths for employees, identifying which courses lead to the highest performance improvements or quickest learning outcomes.
+
+
+i want to make a documentation on this porject for completion . tell me the index chapters that i will require
+
+
+

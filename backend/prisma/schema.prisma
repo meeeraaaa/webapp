@@ -55,7 +55,7 @@ model Skill {
 }
 
 model Progress {
-  id                   Int      @id @default(autoincrement())
+  id                   Int      @id //@default(autoincrement())
   course               Course   @relation(fields: [courseId], references: [id])
   courseId             Int
   user                 User     @relation(fields: [userId], references: [id])
