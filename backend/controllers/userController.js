@@ -246,33 +246,72 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const getEmployeeProgress = async (req, res) => {
-    const userId = req.user.id; 
-    console.log(userId);
+    const userId = req.user.id; // Logged-in user ID
+    const courseId = parseInt(req.params.id); // Course ID from the URL
+
     try {
-        // Fetch all progress entries for the user
-        const progressData = await prisma.progress.findMany({
-            where: {
-                userId: parseInt(userId),
-            },
-            include: {
-                course: {
+        // Fetch the course details (number of chapters, title, etc.)
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+            select: {
+                id: true,
+                title: true,
+                no_of_chapters: true,
+                difficulty_level: true,
+                skills: {
                     select: {
-                        title: true,
-                    },
-                },
-            },
+                        skill: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
         });
 
-        // Map the data to include the course title and update date
-        const formattedData = progressData.map((entry) => ({
-            courseTitle: entry.course.title,
-            updatedAt: entry.updatedAt, // Keep using updatedAt to show progress dates
-        }));
+        if (!course) {
+            return res.status(404).json({ error: "Course not found" });
+        }
 
-        res.json(formattedData);
+        // Fetch the latest progress of the user for the given course
+        const progress = await prisma.progress.findFirst({
+            where: {
+                userId: userId,
+                courseId: courseId
+            },
+            orderBy: {
+                updatedAt: 'desc' // Get the latest progress entry
+            }
+        });
+
+        if (!progress) {
+            return res.status(404).json({ error: "No progress found for this course" });
+        }
+
+        // Calculate the progress percentage if needed
+        const completedChapters = progress.chapters_completed || 0;
+        const percentageCompleted = (completedChapters / course.no_of_chapters) * 100;
+
+        // Return the user's progress along with course details
+        return res.status(200).json({
+            course: {
+                id: course.id,
+                title: course.title,
+                no_of_chapters: course.no_of_chapters,
+                difficulty_level: course.difficulty_level,
+                skills: course.skills
+            },
+            progress: {
+                completed_chapters: completedChapters,
+                percentage_completed: percentageCompleted,
+                updatedAt: progress.updatedAt,
+                certificate: progress.certificate
+            }
+        });
     } catch (error) {
-        console.error("Error fetching employee progress:", error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("Error fetching employee progress:", error.message);
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -332,7 +371,7 @@ export const getCourseDetails = async(req,res) => { //opens up the course page f
                 title: true,
                 no_of_chapters: true,
                 difficulty_level: true,
-                skills: { // Add this to fetch skills associated with the course
+                skills: { 
                     select: {
                         skill: {
                             select: {

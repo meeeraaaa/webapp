@@ -4,20 +4,24 @@ import axios from 'axios';
 
 export default function SkillsByDesignation() {
     const [skills, setSkills] = useState([]);
-    const [selectedSkillId, setSelectedSkillId] = useState('');
+    const [selectedSkillId, setSelectedSkillId] = useState(''); // Initial state is empty, will be set to default later
     const [designationData, setDesignationData] = useState([]);
 
     // Fetch available skills
     const fetchSkills = async () => {
         try {
             const token = localStorage.getItem("token");
-
             const response = await axios.get('http://localhost:1200/admin/skills', {
                 headers: {
-                  Authorization: `Bearer ${token}`, 
+                    Authorization: `Bearer ${token}`, 
                 },
-              });
+            });
             setSkills(response.data);
+
+            // Set the default selected skill to the first skill in the list, if skills are available
+            if (response.data.length > 0) {
+                setSelectedSkillId(response.data[0].id); // Automatically select the first skill
+            }
         } catch (error) {
             console.error('Error fetching skills:', error);
         }
@@ -25,14 +29,17 @@ export default function SkillsByDesignation() {
 
     // Fetch designation count for the selected skill
     const fetchDesignationData = async (skillId) => {
+        if (skillId === "") {
+            setDesignationData([]); // Clear data if no skill selected
+            return;
+        }
         try {
             const token = localStorage.getItem("token");
-
             const response = await axios.get(`http://localhost:1200/admin/skills/${skillId}/designations`, {
                 headers: {
-                  Authorization: `Bearer ${token}`, 
+                    Authorization: `Bearer ${token}`, 
                 },
-              });
+            });
             setDesignationData(response.data);
         } catch (error) {
             console.error('Error fetching designation data:', error);
@@ -40,12 +47,14 @@ export default function SkillsByDesignation() {
     };
 
     useEffect(() => {
-        fetchSkills();
+        fetchSkills(); // Fetch skills on component mount
     }, []);
 
     useEffect(() => {
         if (selectedSkillId) {
-            fetchDesignationData(selectedSkillId); 
+            fetchDesignationData(selectedSkillId); // Fetch data for default or selected skill
+        } else {
+            setDesignationData([]); // Clear the chart if no skill selected
         }
     }, [selectedSkillId]);
 
@@ -72,8 +81,11 @@ export default function SkillsByDesignation() {
     return (
         <div className="skills-container">
             {/* Dropdown to select a skill */}
-            <select className="skills-dropdown" onChange={(e) => setSelectedSkillId(e.target.value)} value={selectedSkillId}>
-                <option value="">Select Skill</option>
+            <select
+                className="skills-dropdown"
+                onChange={(e) => setSelectedSkillId(e.target.value)}
+                value={selectedSkillId}
+            >
                 {skills.map((skill) => (
                     <option key={skill.id} value={skill.id}>
                         {skill.name}

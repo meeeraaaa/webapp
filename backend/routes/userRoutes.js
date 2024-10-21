@@ -13,7 +13,7 @@ import { authenticateToken } from "../middleware/authMiddleWare.js";
 const router = express.Router();
 
 router.use(authenticateToken);
-router.get("/:id/course-progress", getEmployeeProgress);
+router.get("/course/:id/progress", getEmployeeProgress); 
 
 // Route to start a course
 router.post("/start-course", startCourse);

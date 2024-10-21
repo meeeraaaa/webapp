@@ -71,31 +71,59 @@ export const getSkillsByDesignation = async (req, res) => {
           return res.status(400).json({ error: 'Invalid skill ID' });
       }
 
-      // Fetch count of employees for the given skill grouped by designation
+      // Fetch count of employees for the given skill grouped by their designation
       const data = await prisma.userSkill.groupBy({
-          by: ['designationId'],
+          by: ['userId'], // Group by userId, since userSkill doesn't have designationId
           where: { skillId: skillId },
           _count: {
               userId: true, // Count the number of users having this skill
           },
-          include: {
-              designation: true, // Include designation details
+      });
+
+      // Fetch user IDs
+      const userIds = data.map(item => item.userId);
+
+      // Fetch users along with their designations
+      const users = await prisma.user.findMany({
+          where: {
+              id: { in: userIds },
+          },
+          select: {
+              id: true,
+              designation: {
+                  select: {
+                      id: true,
+                      title: true,
+                  },
+              },
           },
       });
 
-      // Map the results to the desired format
-      const result = data.map(item => ({
-          designation: item.designation.title, // Get designation title
-          count: item._count.userId, // Get the count of users
+      // Group users by designation and count the number of users per designation
+      const result = users.reduce((acc, user) => {
+          const designationTitle = user.designation.title;
+          if (!acc[designationTitle]) {
+              acc[designationTitle] = 0;
+          }
+          acc[designationTitle] += 1;
+          return acc;
+      }, {});
+
+      // Convert the result object into an array format
+      const finalResult = Object.keys(result).map(designation => ({
+          designation,
+          count: result[designation],
       }));
 
       // Return the result as a JSON response
-      res.json(result);
+      res.json(finalResult);
   } catch (error) {
       console.error('Error fetching skills by designation:', error);
       res.status(500).json({ error: 'Something went wrong' });
   }
 };
+
+
 export const getEmployeeCourses = async (req, res) => {
   const { id } = req.params; // Extract employee ID from the request parameters
 
@@ -225,5 +253,35 @@ export const getEmployeeProgress = async (req, res) => {
   } catch (error) {
       console.error('Error fetching employee progress:', error);
       return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+export const getCourseDifficultyDistribution = async (req, res) => {
+  try {
+    // Fetch all courses from the database
+    const courses = await prisma.course.findMany({
+      select: {
+        difficulty_level: true, // Select only the difficulty level
+      },
+    });
+
+    // Count courses by difficulty level
+    const difficultyCount = {};
+
+    courses.forEach(course => {
+      const difficulty = course.difficulty_level;
+
+      // Increment the count for each difficulty level
+      if (difficultyCount[difficulty]) {
+        difficultyCount[difficulty]++;
+      } else {
+        difficultyCount[difficulty] = 1;
+      }
+    });
+
+    // Send the aggregated counts as a response
+    return res.json(difficultyCount);
+  } catch (error) {
+    console.error('Error fetching course difficulty distribution:', error);
+    return res.status(500).json({ error: 'Failed to fetch course difficulty distribution.' });
   }
 };

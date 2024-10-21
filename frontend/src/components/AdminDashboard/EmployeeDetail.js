@@ -25,8 +25,9 @@ const CustomYAxis = (props) => (
   </YAxis>
 );
 
-const EmployeeDetailModal = ({ employeeId, employeeName, onClose }) => {
+const EmployeeDetailModal = ({ employeeId, onClose }) => {
   const [progressData, setProgressData] = useState([]);
+  const [userDeatils, setUserDetails] = useState([]);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -38,23 +39,37 @@ const EmployeeDetailModal = ({ employeeId, employeeName, onClose }) => {
         console.error('Error fetching progress:', error);
       }
     };
+    const fetchUserDeatils = async () => {
+      try {
+        const response = await fetch(`http://localhost:1200/admin/employees`);
+        const data = await response.json();
+        setUserDetails(data);
+      } catch (error) {
+        console.error('Error fetching progress:', error);
+      }
+    };
 
     fetchProgress();
+    fetchUserDeatils();
   }, [employeeId]);
 
   const formatDataForChart = () => {
     return progressData.map(({ updatedAt, courseTitle, percentage_completed }) => ({
-      updatedAt, // Use updatedAt from your Progress schema
+      updatedAt,
       courseTitle,
       percentage_completed,
     }));
   };
-
+  function getUserNameById(userId) {
+    const user = userDeatils.find(user => user.id === userId);
+    return user ? user.name : "User not found";
+}
+  
   const chartData = formatDataForChart();
 
   return (
     <div className="employee-progress">
-      <h3>Progress of {employeeName}</h3>
+      <h3>Progress of {getUserNameById(employeeId)}</h3>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={chartData} style={{ border: '1px solid #ccc', borderRadius: '4px' }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -63,7 +78,6 @@ const EmployeeDetailModal = ({ employeeId, employeeName, onClose }) => {
           <Tooltip formatter={(value) => [value, 'Progress Percentage']} />
           <Legend formatter={(value) => <span>{value}</span>} />
 
-          {/* Create lines for each course title */}
           {Array.from(new Set(chartData.map(item => item.courseTitle))).map((courseTitle, index) => (
             <Line
               key={courseTitle} // course title as key

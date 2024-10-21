@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import UserNavBar from './../Layout/UserNavBar';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const CourseDetails = () => {
     const { id } = useParams(); // courseId from URL
@@ -22,13 +23,18 @@ const CourseDetails = () => {
             }
 
             try {
-                const response = await axios.get(`http://localhost:1200/user/course/${id}`, {
+                // Fetch course and progress details
+                const response = await axios.get(`http://localhost:1200/user/course/${id}/progress`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
                 const { course, progress } = response.data;
+
+                // Set course details
                 setCourse(course);
-                setCompletedChapters(progress.chapters_completed || 0);
+                setCompletedChapters(progress.completed_chapters || 0);
+
+                // Set skills if they exist
                 if (Array.isArray(course.skills)) {
                     setCourseSkills(course.skills.map(courseSkill => courseSkill.skill.name));
                 } else {
@@ -56,20 +62,54 @@ const CourseDetails = () => {
             return;
         }
 
-        if (chapter > completedChapters) {
+        // Only allow updating the next chapter in sequence
+        if (chapter === completedChapters + 1) {
             try {
-                setCompletedChapters(chapter);
-
                 await axios.put('http://localhost:1200/user/update-progress', {
                     courseId: id,
-                    chaptersCompleted: chapter - completedChapters
+                    chaptersCompleted: 1 // Increment by 1 chapter
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+
+                // Update local state to reflect progress
+                setCompletedChapters(chapter);
+
+                // If all chapters are completed, trigger course completion
+                if (chapter === course.no_of_chapters) {
+                    handleDone();
+                }
             } catch (error) {
                 console.error('Error updating progress', error);
                 setError('Failed to update progress. Please try again.');
             }
+        }
+    };
+
+    const handleDone = async () => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem("userId");
+
+        if (!token) {
+            console.warn("User is not authenticated. Redirecting to login.");
+            navigate('/');
+            return;
+        }
+
+        try {
+            // Make the API call to complete the course
+            await axios.post('http://localhost:1200/user/complete-course', {
+                userId: userId,
+                courseId: id
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            alert('Course completed, certificate generated, and skills updated!');
+            navigate('/user-dashboard');
+        } catch (error) {
+            console.error('Error completing course', error);
+            alert('Failed to complete the course. Please try again.');
         }
     };
 
@@ -81,33 +121,9 @@ const CourseDetails = () => {
         return <div className="error-message">{error}</div>;
     }
 
-    const handleDone = async () => {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem("userId");
-
-        if (!token) {
-            console.warn("User is not authenticated. Redirecting to login.");
-            navigate('/');
-            return;
-        }
-    
-        try {
-            await axios.post('http://localhost:1200/user/complete-course', {
-                userId: userId, // You need to get the logged-in user's ID
-                courseId: id
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            alert('Course completed and skills updated!');
-            navigate('/user-dashboard');
-        } catch (error) {
-            console.error('Error completing course', error);
-            alert('Failed to complete the course. Please try again.');
-        }
-    };
-    
     return (
         <div className="course-details">
+            <UserNavBar />
             <h1 className="course-title">{course.title}</h1>
             <p className="difficulty-level"><strong>Difficulty Level:</strong> {difficultyLevel}</p>
             <p className="skills"><strong>Skills:</strong> {courseSkills.join(', ')}</p>
@@ -120,9 +136,9 @@ const CourseDetails = () => {
                             <label>
                                 <input
                                     type="checkbox"
-                                    checked={i < completedChapters}
+                                    checked={i < completedChapters} // Mark chapters as checked if completed
                                     onChange={() => handleChapterProgress(i + 1)}
-                                    disabled={i + 1 > completedChapters + 1}
+                                    disabled={i + 1 > completedChapters + 1} // Disable future chapters
                                 />
                                 Chapter {i + 1}
                             </label>
@@ -130,9 +146,23 @@ const CourseDetails = () => {
                     ))}
                 </ul>
             </div>
-            <button className="done-button" onClick={handleDone}>
-                Done
-            </button>
+
+            {/* Button Row for 'Update' and 'Finish' */}
+            <div className="button-row" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                {/* Update Button - Link to Dashboard */}
+                <Link className="btn btn-secondary" to="/user-dashboard">
+                    Update
+                </Link>
+
+                {/* Finish Button */}
+                <button
+                    className="btn btn-primary"
+                    onClick={handleDone}
+                    disabled={completedChapters < course.no_of_chapters}
+                >
+                    Finish
+                </button>
+            </div>
         </div>
     );
 };

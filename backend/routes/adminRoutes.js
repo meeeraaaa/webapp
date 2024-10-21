@@ -6,7 +6,8 @@ import {
   getEmployeeCourses,
   getEmployeeProgress,
   getCourseCompletionByDesignation,
-  getSkillsByDesignation
+  getSkillsByDesignation,
+  getCourseDifficultyDistribution 
 } from '../controllers/adminController.js';
 
 import { authenticateToken, authorizeAdmin } from "../middleware/authMiddleWare.js";
@@ -34,5 +35,6 @@ router.get('/designations', getDesignations, authorizeAdmin);
 //add employee detail route.
 router.get('/employees/:id/courses', getEmployeeCourses, authorizeAdmin);
 router.get('/employees/:id/progress', getEmployeeProgress, authorizeAdmin); 
+router.get('/courses/difficulty-distribution',getCourseDifficultyDistribution,authorizeAdmin)
 
 export default router;

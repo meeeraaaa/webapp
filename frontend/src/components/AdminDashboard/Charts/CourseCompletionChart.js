@@ -5,7 +5,7 @@ import 'chart.js/auto';
 
 export default function CourseCompletionChart() {
   const [completionData, setCompletionData] = useState([]);
-  const [courseId, setCourseId] = useState('');
+  const [courseId, setCourseId] = useState(''); // Will be set to default course later
   const [courses, setCourses] = useState([]);
   const [isOpen, setIsOpen] = useState(false); 
 
@@ -19,6 +19,11 @@ export default function CourseCompletionChart() {
         },
       });
       setCourses(response.data);
+
+      // Set default courseId to the first course in the list, if available
+      if (response.data.length > 0) {
+        setCourseId(response.data[0].id); // Automatically select the first course
+      }
     } catch (error) {
       console.error('Error fetching courses:', error);
     }
@@ -39,12 +44,12 @@ export default function CourseCompletionChart() {
   };
 
   useEffect(() => {
-    fetchCourses();
+    fetchCourses(); // Fetch courses when the component is mounted
   }, []);
 
   useEffect(() => {
     if (courseId) {
-      fetchCompletionData(courseId);
+      fetchCompletionData(courseId); // Fetch completion data for the selected (or default) course
     }
   }, [courseId]);
 

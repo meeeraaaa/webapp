@@ -73,7 +73,17 @@ const EmployeesList = () => {
                 <td>{new Date(user.joindate).toLocaleDateString()}</td>
                 <td>{user.designation.title}</td>
                 <td>
-                  <button className="btn btn-info custom-btn" onClick={() => fetchEmployeeCourses(user.id)}>
+                <button 
+    style={{ 
+      backgroundColor: 'rgba(0, 123, 255, 0.5)', // Lightened shade of blue
+      color: 'white', 
+      border: 'none', 
+      cursor: 'pointer', 
+      padding: '2px',
+      borderRadius: '8px'
+    }} 
+    onClick={() => fetchEmployeeCourses(user.id)}
+  >
                     View Employee
                   </button>
                 </td>
